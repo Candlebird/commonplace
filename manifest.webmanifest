@@ -1,7 +1,7 @@
 {
   "name": "Commonplace",
   "short_name": "Notes",
-  "description": "Every note from your phone, Drive, Gemini, Google Home and paper notebooks, in one searchable place.",
+  "description": "A personal notebook: capture, file, tag and search your notes on every device.",
   "id": "./",
   "start_url": "./",
   "scope": "./",

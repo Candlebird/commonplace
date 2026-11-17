@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Commonplace</title>
-  <meta name="description" content="Every note from your phone, Drive, Gemini, Google Home and paper notebooks, in one searchable place.">
+  <meta name="description" content="A personal notebook: capture notes, file them into notebooks, tag them and search them on every device.">
   <meta name="theme-color" content="#c2410c">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon-192.png">
@@ -316,70 +316,7 @@
   </dialog>
 
   <!-- Import -->
-  <dialog id="import">
-    <form id="imp-form" method="dialog" autocomplete="off">
-      <div class="dlg-body">
-        <p class="dlg-title">Bring notes in</p>
-        <div class="tabs">
-          <button type="button" data-act="imp-tab" data-tab="paste" class="on">Paste text</button>
-          <button type="button" data-act="imp-tab" data-tab="files">Files</button>
-          <button type="button" data-act="imp-tab" data-tab="how">Phone, Gemini &amp; Google Home</button>
-        </div>
-        <div data-pane="paste" class="photo">
-          <textarea id="imp-text" rows="10" placeholder="Paste notes here: from Gemini, a Google Doc, an email to yourself…"></textarea>
-          <div class="fields">
-            <label>Split into <select id="imp-split">
-              <option value="one">One note</option>
-              <option value="blank">A note per blank-line block</option>
-              <option value="rule">A note per --- section</option>
-              <option value="line">A note per line</option>
-            </select></label>
-          </div>
-        </div>
-        <div data-pane="files" class="photo" hidden>
-          <p class="help" style="margin:0">Text, Markdown and HTML files become one note each, titled by file name. Google Keep notes from
-            <a href="https://takeout.google.com/" target="_blank" rel="noopener">Google Takeout</a> (the <code>.json</code> files in the Keep folder) keep their
-            titles, checklists, labels, dates, pins and archive state. A Commonplace export restores as-is. Notes already here are skipped.</p>
-          <input type="file" id="imp-files" multiple accept=".txt,.md,.markdown,.json,.html,.htm,.csv,text/*,application/json">
-        </div>
-        <div data-pane="how" class="help" hidden>
-          <h3>From your phone (Android)</h3>
-          <p>Open this page in Chrome, then menu ⋮ → <b>Add to Home screen</b> / <b>Install app</b>. After that, Commonplace shows up in the
-            <b>Share</b> sheet of every app: Gemini, Google Docs/Drive, Keep, Messages, Chrome. Share a reply, a doc link or a webpage and it lands
-            here, ready to file. On iPhone, use Safari → Share → Add to Home Screen, then paste.</p>
-          <h3>From Gemini</h3>
-          <p>In a Gemini reply, tap <b>Share</b> (or copy) and pick Commonplace. On the web, copy the reply and paste it into the box at the top.
-            Notes are marked as from Gemini automatically when the shared text has a Gemini link.</p>
-          <h3>From Google Home / Assistant</h3>
-          <p>"Hey Google, take a note…" saves to Google Keep. Open Keep and share the note to Commonplace, or bring all of them in at once with a
-            Takeout export (Files tab).</p>
-          <h3>From Google Drive</h3>
-          <p>Share a Doc to Commonplace to save its link, or download it as <b>.txt</b> (File → Download → Plain text) and add it in the Files tab
-            to make its text searchable.</p>
-          <h3>From paper notebooks</h3>
-          <p>Tap <b>+</b>, then <b>Add photo</b> and photograph the page. <b>Read text from photo</b> pulls out the words so the page is searchable
-            (works best on printing; check it on handwriting). Set <b>Date written</b> to when you wrote it.</p>
-          <h3>Search tips</h3>
-          <ul>
-            <li><code>dentist</code> words anywhere · <code>"exact phrase"</code> · <code>-word</code> leaves out</li>
-            <li><code>#recipe</code> tag · <code>in:work</code> notebook · <code>from:gemini</code> source</li>
-            <li><code>is:pinned</code> <code>is:todo</code> <code>is:photo</code> <code>is:inbox</code> <code>is:archived</code></li>
-            <li><code>after:2026-01-01</code> <code>before:2026-06-30</code></li>
-          </ul>
-        </div>
-        <div class="fields" id="imp-common">
-          <label>Came from <select id="imp-source"></select></label>
-          <label>Notebook <input id="imp-nb" list="nb-list" placeholder="Inbox (unfiled)"></label>
-        </div>
-        <p class="hint" id="imp-preview" style="margin:0"></p>
-      </div>
-      <div class="dlg-foot">
-        <span class="spacer"></span>
-        <button type="button" data-act="imp-cancel">Close</button>
-        <button type="submit" class="primary" id="imp-go">Import</button>
-      </div>
-    </form>
-  </dialog>
+  <dialog id="import"></dialog>
 
   <!-- Account -->
   <dialog id="account" style="width:min(420px, calc(100vw - 24px)); height:auto">
@@ -670,6 +607,7 @@
       $('#app').hidden = !u;
       if (u === undefined) { $('#gate').hidden = true; return; }
       if (!u) return renderGate();
+      if (!$('#cap-source').options.length) $('#cap-source').innerHTML = sourceOptions(state.captureSource);
       $('#avatar').innerHTML = u.photoURL ? `<img src="${esc(u.photoURL)}" alt="" referrerpolicy="no-referrer">` : esc((u.displayName || u.email || '?')[0]);
       $('#status').textContent = !state.loaded ? 'Loading…' : state.pending ? 'Saving…' : state.offline ? 'Offline · saved on this device' : 'Synced';
       renderBanner();
@@ -682,9 +620,10 @@
       $('#gate').innerHTML = `
         <img src="icon.svg" alt="">
         <h1>Commonplace</h1>
-        <p>One place for every note: phone, Google Drive, Gemini, Google Home and paper notebooks. Sorted, tagged and searchable on all your devices.</p>
-        <button class="primary" data-act="signin">Sign in with Google</button>
-        <p style="font-size:.85rem">Your notes are private to your Google account.</p>
+        <p>A personal notebook. Jot things down, file them into notebooks, tag them and search everything, on every device you use.</p>
+        <button class="primary" data-act="signin">Sign in</button>
+        <p style="font-size:.85rem">Notes are private to the account you sign in with.<br>
+          A small open-source project by Candlebird · <a href="https://github.com/Candlebird/commonplace">source code</a> · <a href="https://candlebird.github.io/">other projects</a></p>
         ${state.error ? `<p style="color:var(--danger)">${esc(state.error)}</p>` : ''}`;
     }
 
@@ -867,7 +806,7 @@
 
       if (!list.length) {
         const msg = searching ? `Nothing matches <b>${esc(state.q)}</b>.`
-          : state.notes.size === 0 ? `No notes yet. Jot one above, or <button class="ghost" data-act="import" style="color:var(--accent)">bring notes in</button> from Keep, Drive, Gemini or files.`
+          : state.notes.size === 0 ? `No notes yet. Jot one above, or <button class="ghost" data-act="import" style="color:var(--accent)">bring notes in</button> from other apps or files.`
           : state.box === 'inbox' && !chips.length ? 'Inbox zero. Everything is filed.'
           : 'No notes here.';
         h += `<div class="empty">${msg}</div>`;
@@ -1135,6 +1074,7 @@
     let impTab = 'paste';
     let impFiles = [];
     function openImport(tab = 'paste') {
+      wireImport();
       $('#imp-source').innerHTML = sourceOptions(tab === 'files' ? 'drive' : 'other');
       setImpTab(tab);
       $('#import').showModal();
@@ -1202,6 +1142,74 @@
       } else p.textContent = '';
       $('#imp-go').disabled = !p.textContent;
     }
+    // Built on first use, after sign-in: the signed-out page stays a plain sign-in screen.
+    const IMPORT_HTML = `
+    <form id="imp-form" method="dialog" autocomplete="off">
+      <div class="dlg-body">
+        <p class="dlg-title">Bring notes in</p>
+        <div class="tabs">
+          <button type="button" data-act="imp-tab" data-tab="paste" class="on">Paste text</button>
+          <button type="button" data-act="imp-tab" data-tab="files">Files</button>
+          <button type="button" data-act="imp-tab" data-tab="how">Phone, Gemini &amp; Google Home</button>
+        </div>
+        <div data-pane="paste" class="photo">
+          <textarea id="imp-text" rows="10" placeholder="Paste notes here: from Gemini, a Google Doc, an email to yourself…"></textarea>
+          <div class="fields">
+            <label>Split into <select id="imp-split">
+              <option value="one">One note</option>
+              <option value="blank">A note per blank-line block</option>
+              <option value="rule">A note per --- section</option>
+              <option value="line">A note per line</option>
+            </select></label>
+          </div>
+        </div>
+        <div data-pane="files" class="photo" hidden>
+          <p class="help" style="margin:0">Text, Markdown and HTML files become one note each, titled by file name. Google Keep notes from
+            <a href="https://takeout.google.com/" target="_blank" rel="noopener">Google Takeout</a> (the <code>.json</code> files in the Keep folder) keep their
+            titles, checklists, labels, dates, pins and archive state. A Commonplace export restores as-is. Notes already here are skipped.</p>
+          <input type="file" id="imp-files" multiple accept=".txt,.md,.markdown,.json,.html,.htm,.csv,text/*,application/json">
+        </div>
+        <div data-pane="how" class="help" hidden>
+          <h3>From your phone (Android)</h3>
+          <p>Open this page in Chrome, then menu ⋮ → <b>Add to Home screen</b> / <b>Install app</b>. After that, Commonplace shows up in the
+            <b>Share</b> sheet of every app: Gemini, Google Docs/Drive, Keep, Messages, Chrome. Share a reply, a doc link or a webpage and it lands
+            here, ready to file. On iPhone, use Safari → Share → Add to Home Screen, then paste.</p>
+          <h3>From Gemini</h3>
+          <p>In a Gemini reply, tap <b>Share</b> (or copy) and pick Commonplace. On the web, copy the reply and paste it into the box at the top.
+            Notes are marked as from Gemini automatically when the shared text has a Gemini link.</p>
+          <h3>From Google Home / Assistant</h3>
+          <p>"Hey Google, take a note…" saves to Google Keep. Open Keep and share the note to Commonplace, or bring all of them in at once with a
+            Takeout export (Files tab).</p>
+          <h3>From Google Drive</h3>
+          <p>Share a Doc to Commonplace to save its link, or download it as <b>.txt</b> (File → Download → Plain text) and add it in the Files tab
+            to make its text searchable.</p>
+          <h3>From paper notebooks</h3>
+          <p>Tap <b>+</b>, then <b>Add photo</b> and photograph the page. <b>Read text from photo</b> pulls out the words so the page is searchable
+            (works best on printing; check it on handwriting). Set <b>Date written</b> to when you wrote it.</p>
+          <h3>Search tips</h3>
+          <ul>
+            <li><code>dentist</code> words anywhere · <code>"exact phrase"</code> · <code>-word</code> leaves out</li>
+            <li><code>#recipe</code> tag · <code>in:work</code> notebook · <code>from:gemini</code> source</li>
+            <li><code>is:pinned</code> <code>is:todo</code> <code>is:photo</code> <code>is:inbox</code> <code>is:archived</code></li>
+            <li><code>after:2026-01-01</code> <code>before:2026-06-30</code></li>
+          </ul>
+        </div>
+        <div class="fields" id="imp-common">
+          <label>Came from <select id="imp-source"></select></label>
+          <label>Notebook <input id="imp-nb" list="nb-list" placeholder="Inbox (unfiled)"></label>
+        </div>
+        <p class="hint" id="imp-preview" style="margin:0"></p>
+      </div>
+      <div class="dlg-foot">
+        <span class="spacer"></span>
+        <button type="button" data-act="imp-cancel">Close</button>
+        <button type="submit" class="primary" id="imp-go">Import</button>
+      </div>
+    </form>
+`;
+    function wireImport() {
+      if ($('#imp-form')) return;
+      $('#import').innerHTML = IMPORT_HTML;
     $('#imp-text').addEventListener('input', impPreview);
     $('#imp-split').addEventListener('change', impPreview);
     $('#imp-files').addEventListener('change', async (e) => {
@@ -1243,6 +1251,7 @@
       toast(`Imported ${items.length} note${items.length === 1 ? '' : 's'}${skipped ? `, skipped ${skipped} already here or empty` : ''}.`);
       render();
     });
+    }
 
     function toast(msg) {
       const el = document.createElement('div');
@@ -1312,7 +1321,7 @@
       if (act === 'account') {
         const u = state.user;
         $('#acct-body').innerHTML = `<p class="dlg-title">${esc(u.displayName || 'Signed in')}</p><p class="muted" style="margin:0">${esc(u.email)}</p>
-          <p class="hint" style="margin:0">${state.notes.size} notes. Only this Google account can see them. Sign in with it on any device to get them there.</p>`;
+          <p class="hint" style="margin:0">${state.notes.size} notes. Only this account can see them. Sign in with it on any device to get them there.</p>`;
         return void $('#account').showModal();
       }
       if (act === 'menu') { state.navOpen = !state.navOpen; return renderSide(); }
@@ -1439,7 +1448,6 @@
     const autoGrow = () => { capText.style.height = 'auto'; capText.style.height = Math.min(capText.scrollHeight + 2, 320) + 'px'; };
     capText.addEventListener('input', autoGrow);
     capText.addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); $('#capture').requestSubmit(); } });
-    $('#cap-source').innerHTML = sourceOptions(state.captureSource);
     $('#cap-source').addEventListener('change', (e) => { state.captureSource = e.target.value; saveView(); });
     $('#cap-nb').addEventListener('focus', (e) => { if (!e.target.value && state.notebook) e.target.value = state.notebook; });
     $('#capture').addEventListener('submit', (e) => {

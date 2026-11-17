@@ -1,6 +1,6 @@
 # Commonplace
 
-One place for every note: phone, Google Drive, Gemini, Google Home and paper notebooks. Live at https://candlebird.github.io/commonplace/.
+A personal notebook: capture notes from anywhere, file them into notebooks, tag and search them on every device. Live at https://candlebird.github.io/commonplace/.
 
 - A single `index.html` with no build step (plus `sw.js` and `manifest.webmanifest` so it installs as an app). GitHub Pages serves `main` as-is.
 - Google sign-in through the Crusade Dataslate's Firebase project. Notes are private to the account that wrote them: the
