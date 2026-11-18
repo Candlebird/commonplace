@@ -1,18 +1,27 @@
 # Commonplace
 
-A personal notebook: capture notes from anywhere, file them into notebooks, tag and search them on every device. Live at https://candlebird.github.io/commonplace/.
+A notes app for every device: <https://candlebird.github.io/commonplace/>
 
-- A single `index.html` with no build step (plus `sw.js` and `manifest.webmanifest` so it installs as an app). GitHub Pages serves `main` as-is.
-- Google sign-in through the Crusade Dataslate's Firebase project. Notes are private to the account that wrote them: the
-  access rules for `notes/*` and `notePhotos/*` are in the Dataslate repo's `firestore.rules`.
-- Installed on Android, it appears in the share sheet (Gemini, Docs, Keep, Chrome…). Shared text arrives as `?title=&text=&url=`.
-- Imports pasted text, `.txt`/`.md`/`.html` files, Google Keep Takeout `.json`, and its own JSON backups. Photos of paper pages
-  can be read with tesseract.js (loaded on demand from jsDelivr) so their text is searchable.
+- **Write** formatted notes: headings, bold, lists, quotes, links, highlights.
+- **Checklists** where ticked items sink to the bottom, plus "clear ticked".
+- **Link notes** by typing `[[`, and see "Linked from" on the other end. `#tags` work anywhere in the text.
+- **Notebooks, pins, colors, archive, trash** and instant search (`#tag`, `in:notebook`, `is:pinned`, `has:todo`, `is:overdue`, `-word`, `before:2026-01-01`).
+- **Reminders** with a Reminders view (Overdue, Today, Upcoming), alerts while the app is open, and "Add to calendar".
+- **Share** a note or a whole notebook with people's email addresses (can edit or can view). They sign in to see it.
+- **Photos and sketches**, with the text in photos read so it shows up in search.
+- **Voice**: dictate into any note, or use **Drive mode** (the car button) for hands-free notes, lists and reminders.
+- **Capture from anywhere**: install it to your home screen, then share text or links from other apps into it. Long-press the icon for New list, Voice note and Drive mode.
+- **Backup** to JSON or Markdown, and restore.
 
-## Data
+## Development
 
-`notes/{id}`: `{ owner, title, body, labels[], source, notebook, pinned, archived, trashed, hasPhoto, ocr, capturedAt, createdAt, updatedAt }`.
-`source` is one of phone, keep, drive, gemini, home, paper, web, other. An empty `notebook` means the note is in the Inbox.
-Tags are the `labels` plus any `#hashtags` in the title or body.
+```sh
+npm install
+npm run dev:stub   # in-memory data, no sign-in (add ?as=someone@example.com to switch user)
+npm test
+npm run build
+```
 
-`notePhotos/{id}`: `{ owner, data }`, a JPEG data URL shrunk to fit under 700 KB.
+Data lives in the shared Candlebird Firebase project. The access rules are in
+`Candlebird/crusade-dataslate` (`firestore.rules`) and publish automatically when pushed.
+Pushing to `main` here builds and deploys to GitHub Pages.
